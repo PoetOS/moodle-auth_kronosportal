@@ -70,3 +70,7 @@ $string['eventkronosportal_user_profile_solutionid_not_found'] = 'User Solution 
 $string['eventkronosportal_userset_not_found'] = 'Solution ID User Set profile field not found';
 $string['eventkronosportal_userset_expiry_not_found'] = 'User Set expiry and extension date not found';
 $string['eventkronosportal_userset_has_expired'] = 'User User Set expired';
+$string['wfc_auth_not_enabled'] = 'Kronos Portal authentication is not enabled.  Unable to login to Moodle.';
+$string['wfc_auth_solutionid_not_found'] = 'Customer ID not found.  Unable to login to Moodle.';
+$string['wfc_auth_solutionid_expired'] = 'Custom subscription is expired.  Unable to login to Moodle.';
+$string['wfc_auth_error_applying_business_rules'] = 'Incomplete account information.  Unable to login to Moodle.';

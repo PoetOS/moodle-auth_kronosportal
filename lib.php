@@ -86,12 +86,20 @@ function kronosportal_update_user($userdata) {
     $user = $DB->get_record('user', array('id' => $userid));
     $solutionfield = "profile_field_".kronosportal_get_solutionfield();
     foreach (array("firstname", "lastname", $solutionfield, "password", "email", "city", "country") as $name) {
-        $user->$name = $userdata->$name;
+        if (isset($userdata->$name)) {
+            $user->$name = $userdata->$name;
+        }
     }
+
+    $updatepassword = false;
     // Update user, update password only if there is a value for the password field.
-    user_update_user($user, !empty($user->password));
+    if (isset($userdata->password) && !empty($userdata->password)) {
+        $updatepassword = true;
+    }
+    user_update_user($user, $updatepassword);
     // Assign custom fields.
     profile_save_data($userdata);
+
     // Retrieve custom user fields.
     $user = $DB->get_record('user', array('id' => $userid));
     profile_load_data($user);
@@ -201,4 +209,77 @@ function kronosportal_get_solutionfield() {
     $config = get_config('auth_kronosportal');
     $result = $DB->get_record('user_info_field', array('id' => $config->user_field_solutionid));
     return $result->shortname;
+}
+
+/**
+ * This function applies the Kronos business rules to user profile data.
+ * @param array $data Array of portal field names (key) and field data (value).
+ * @return mixed An array containing the formatted data.  False is return is an error is encountered.
+ */
+function kronosportal_apply_kronos_business_rules($data) {
+    $newusr = new stdClass();
+
+    // Set the username.
+    $conditions = isset($data['solutionid']) && isset($data['personnumber'])
+        && isset($data['firstname']) && isset($data['lastname']) && isset($data['country']) && isset($data['learningpath']);
+
+    $nonemptyconditions = !empty($data['solutionid']) && !empty($data['personnumber'])
+        && !empty($data['firstname']) && !empty($data['lastname']) && !empty($data['country']) && !empty($data['learningpath']);
+
+    if ($conditions && $nonemptyconditions) {
+        $newusr->username = 'wfc'.strtolower($data['solutionid'].$data['personnumber']);
+        $newusr->username = clean_param($newusr->username, PARAM_USERNAME);
+        $newusr->password = "pwd".strrev($data['personnumber']).strrev($data['solutionid']);
+        $newusr->email = $newusr->username.'@wfc.kronos.com';
+        $newusr->firstname = $data['firstname'];
+        $newusr->lastname = $data['lastname'];
+        $newusr->country = $data['country'];
+        $newusr->lang = 'en';
+        $newusr->learningpath = ('-R' === substr($data['learningpath'], -2)) ? substr_replace($data['learningpath'], '', -2, 2) : $data['learningpath'];
+        $newusr->restricted = ('-R' === substr($data['learningpath'], -2)) ? '1' : '0';
+        $newusr->personnumber = $data['personnumber'];
+        $newusr->solutionid = $data['solutionid'];
+    } else {
+        return false;
+    }
+
+    return (array)$newusr;
+}
+
+/**
+ * This function updates the standard profile data of a user coming from the WFC portal.
+ * @param object $muser A Moodle user object retrieved from the mdl_user table.
+ * @param object $data A WFC user object obtained from (@see kronosportal_apply_kronos_business_rules())
+ */
+function kronosportal_sync_standard_wfc_profile_fields($muser, $data) {
+    $muser->password = $data->password;
+    $muser->firstname = $data->firstname;
+    $muser->lastname = $data->lastname;
+    $muser->country = $data->country;
+    $muser->lang = $data->lang;
+}
+
+/**
+ * This function returns an array of Moodle profile fields (key) and protal profile values (value).
+ * The mapping is taking from the authentication configuration.
+ * @todo add PHPUnit test.
+ * @param object $muserdata A Moodle user object.
+ * @param array $wfcuserdata A WFC user array.
+ * @return object A Moodle profile fields (property) and protarl profile values (value).
+ */
+function kronosportal_sync_user_profile_to_portal_profile($muserdata, $wfcuserdata) {
+    $config = get_config('auth_kronosportal');
+
+    foreach ((array)$config as $moodlefieldname => $wfcfieldname) {
+        if (false !== strpos($moodlefieldname, 'profile_field_')) {
+            $lowercase = strtolower($wfcfieldname);
+            if (!isset($muserdata->$moodlefieldname) || !isset($wfcuserdata[$lowercase])) {
+                continue;
+            }
+
+            $muserdata->$moodlefieldname = clean_param($wfcuserdata[$lowercase], PARAM_ALPHANUMEXT);
+        }
+    }
+
+    return $muserdata;
 }

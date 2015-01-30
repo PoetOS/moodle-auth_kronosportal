@@ -124,7 +124,7 @@ $desc = get_string('header_portal_map_desc', $langfile);
 $settings->add(new \admin_setting_heading('kronosportal_userset_map', $title, $desc));
 
 foreach ($moodlecustomfields as $shortname => $name) {
-    $setting = new \admin_setting_configtext($shortname, $name, '', '', PARAM_TEXT);
+    $setting = new \admin_setting_configtext('profile_field_'.$shortname, $name, '', '', PARAM_TEXT);
     $setting->plugin = AUTH_KRONOSPORTAL_COMP_NAME;
     $settings->add($setting);
 }
