@@ -17,7 +17,7 @@
 /**
  * Kronos virtual machine request web service.
  *
- * @package    mod_kronosportal
+ * @package    auth_kronosportal
  * @author     Remote-Learner.net Inc
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @copyright  (C) 2015 Remote Learner.net Inc http://www.remote-learner.net

@@ -133,16 +133,16 @@ $title = get_string('header_portal_urls', $langfile);
 $desc = get_string('header_portal_urls_desc', $langfile);
 $settings->add(new \admin_setting_heading('kronosportal_urls', $title, $desc));
 
-$field = 'kronosportal_successurl';
-$title = get_string($field, $langfile);
-$desc = get_string($field.'_desc', $langfile);
-$setting->plugin = AUTH_KRONOSPORTAL_COMP_NAME;
-$setting = new \admin_setting_configtext($field, $title, $desc, '', PARAM_TEXT);
-$settings->add($setting);
-
 $field = 'kronosportal_errorurl';
 $title = get_string($field, $langfile);
 $desc = get_string($field.'_desc', $langfile);
-$setting->plugin = AUTH_KRONOSPORTAL_COMP_NAME;
 $setting = new \admin_setting_configtext($field, $title, $desc, '', PARAM_TEXT);
+$setting->plugin = AUTH_KRONOSPORTAL_COMP_NAME;
+$settings->add($setting);
+
+$field = 'kronosportal_successurl';
+$title = get_string($field, $langfile);
+$desc = get_string($field.'_desc', $langfile);
+$setting = new \admin_setting_configtext($field, $title, $desc, '', PARAM_TEXT);
+$setting->plugin = AUTH_KRONOSPORTAL_COMP_NAME;
 $settings->add($setting);

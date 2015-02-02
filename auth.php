@@ -26,6 +26,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->libdir.'/authlib.php');
+require_once($CFG->dirroot."/auth/kronosportal/lib.php");
 
 class auth_plugin_kronosportal extends auth_plugin_base {
     /** @var string The Moodle username. */
@@ -226,8 +227,7 @@ class auth_plugin_kronosportal extends auth_plugin_base {
      * @return bool Authentication success or failure.
      */
     public function user_login($username, $password) {
-        global $CFG, $DB, $USER;
-
+        global $CFG, $DB, $USER, $SESSION;
         // Check if the plug-in is configured correctly.
         if (!$this->is_configuration_valid()) {
             $event = \auth_kronosportal\event\kronosportal_invalid_configuration::create(array());
@@ -241,24 +241,24 @@ class auth_plugin_kronosportal extends auth_plugin_base {
 
         $this->username = $user->username;
 
-        // Check if the user's User Set exists, by searching for a User Set via a the Solution ID profile field.
-        if (!$this->user_solutionid_field_exists($user->id)) {
-            return false;
-        }
-
-        // Get the User's solution id value.
-        $usersolutionid = $this->get_user_solution_id($user->id);
-
-        // Search for a User Set that contains a matching Solutions ID with the user logging in.  Kronos User Set Soultion Ids are meant to be unique.
-        $usersetcontextandname = $this->userset_solutionid_exists($usersolutionid);
-        if (empty($usersetcontextandname)) {
-            return false;
-        }
-
-        // Check if the User Set expiry and extension date are less than the current date.
-        $valid = $this->user_set_has_valid_subscription($usersolutionid, $usersetcontextandname->id, $usersetcontextandname->name);
-        if (!$valid) {
-            return false;
+        // Load custom fields.
+        profile_load_data($user);
+        // Do validation checks based on Kronos business rules.
+        $result = kronosportal_validate_user($user);
+        if ($result == "success") {
+            if (!empty($this->config->kronosportal_successurl)) {
+                $url = $this->config->kronosportal_successurl;
+                if (preg_match("/^\//", $url)) {
+                    $url = $CFG->wwwroot.$url;
+                }
+                $SESSION->wantsurl = $url;
+            }
+        } else {
+            $errorurl = '';
+            if (!empty($this->config->kronosportal_errorurl)) {
+                $errorurl = $this->config->kronosportal_errorurl;
+            }
+            $this->handleerror($errorurl, 'usermessage'.$result);
         }
 
         if (!validate_internal_user_password($user, $password)) {
@@ -268,7 +268,7 @@ class auth_plugin_kronosportal extends auth_plugin_base {
         if ($password === 'changeme') {
             // Force the change - this is deprecated and it makes sense only for manual auth,
             // because most other plugins can not change password easily or
-            // passwords are always specified by users
+            // passwords are always specified by users.
             set_user_preference('auth_forcepasswordchange', true, $user->id);
         }
         return true;
@@ -370,7 +370,7 @@ class auth_plugin_kronosportal extends auth_plugin_base {
      * @return void
      */
     public function loginpage_hook() {
-        global $frm, $user, $DB, $USER, $SESSION;
+        global $frm, $user, $DB, $USER, $SESSION, $CFG;
         $token = optional_param('token', '', PARAM_TEXT);
         $url = optional_param('url', '', PARAM_TEXT);
         if (empty($url) && !empty($this->config->kronosportal_successurl)) {
@@ -395,10 +395,15 @@ class auth_plugin_kronosportal extends auth_plugin_base {
                 // User is all ready logged in as this user and is reusing token.
                 $user = $DB->get_record('user', array('id' => $tokens->userid));
                 if (!empty($user) && !empty($user->username)) {
+                    // Load custom fields.
+                    profile_load_data($user);
                     // Do validation checks based on Kronos business rules.
                     $result = kronosportal_validate_user($user);
                     if ($result == "success") {
                         $frm->username = $user->username;
+                        if (preg_match("/^\//", $url)) {
+                            $url = $CFG->wwwroot.$url;
+                        }
                         $SESSION->wantsurl = $url;
                     } else {
                         $this->handleerror($errorurl, 'usermessage'.$result);
@@ -419,12 +424,16 @@ class auth_plugin_kronosportal extends auth_plugin_base {
      * @param string $errorurl Url to redirect to.
      * @param string $error Name of error message to display.
      */
-    public function handle_error($errorurl, $error) {
+    public function handleerror($errorurl, $error) {
+        global $CFG;
         if (!empty($errorurl)) {
             if (preg_match('/\?/', $errorurl)) {
                 $errorurl .= '&error='.$error;
             } else {
-                $errorurl .= '?error='.$errorurl;
+                $errorurl .= '?error='.urlencode($error);
+            }
+            if (preg_match("/^\//", $errorurl)) {
+                $errorurl = $CFG->wwwroot.$errorurl;
             }
             redirect($errorurl);
         } else {
@@ -453,4 +462,5 @@ class auth_plugin_kronosportal extends auth_plugin_base {
         $expiry = time() - 24 * 3600;
         $DB->delete_records_select('kronosportal_tokens', ' timecreated < ? ', array($expiry));
     }
+
 }
