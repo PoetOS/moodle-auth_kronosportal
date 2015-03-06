@@ -103,12 +103,6 @@ $setting = new \admin_setting_configselect('expiry', $title, $desc, null, $custo
 $setting->plugin = AUTH_KRONOSPORTAL_COMP_NAME;
 $settings->add($setting);
 
-$title = get_string('expiry_field', $langfile);
-$desc = get_string('expiry_field_desc', $langfile);
-$setting = new \admin_setting_configselect('expiry', $title, $desc, null, $customfieldsdatetime);
-$setting->plugin = AUTH_KRONOSPORTAL_COMP_NAME;
-$settings->add($setting);
-
 $title = get_string('extension_field', $langfile);
 $desc = get_string('extension_field_desc', $langfile);
 $setting = new \admin_setting_configselect('extension', $title, $desc, null, $customfieldsdatetime);

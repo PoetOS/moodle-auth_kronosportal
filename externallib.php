@@ -107,7 +107,7 @@ class auth_kronosportal_external extends external_api {
     public static function create_token_returns() {
         return new external_single_structure(array(
             'status' => new external_value(PARAM_TEXT, 'Returns success when token is created.'),
-            'token' => new external_value(PARAM_TEXT, 'sso token', PARAM_OPTIONAL),
+            'token' => new external_value(PARAM_TEXT, 'sso token', VALUE_OPTIONAL),
             'userid' => new external_value(PARAM_INT, 'User id of user.')
         ));
     }

@@ -32,20 +32,53 @@ require_once('lib.php');
 
 global $DB, $PAGE;
 
-$wfcsolid = required_param('solutionID', PARAM_ALPHANUM);
-$wfcpnum = required_param('personNumber', PARAM_ALPHANUM);
-$wfcfname = required_param('firstName', PARAM_ALPHANUMEXT);
-$wfclname = required_param('lastName', PARAM_ALPHANUMEXT);
-$wfccountry = required_param('country', PARAM_ALPHA);
-$wfclp = required_param('learningpath', PARAM_ALPHANUMEXT);
+$wfcsolid = '';
+$wfcpnum = '';
+$wfcfname = '';
+$wfclname = '';
+$wfccountry = '';
+$wfclp = '';
+$missingparameters = 'solutionid,personnumber,firstname,lastname';
+
+// This block of code is needd to handle POST variables from WFC portal sites, that contain with different case characters as there is not standard.
+foreach ($_POST as $paramname => $paramvalue) {
+    switch (strtolower($paramname)) {
+        case 'solutionid':
+            $wfcsolid = clean_param($paramvalue, PARAM_ALPHANUMEXT);
+            $missingparameters = str_replace(strtolower($paramname), '', $missingparameters);
+            break;
+        case 'personnumber':
+            $wfcpnum = clean_param($paramvalue, PARAM_ALPHANUMEXT);
+            $missingparameters = str_replace(strtolower($paramname), '', $missingparameters);
+            break;
+        case 'firstname':
+            $wfcfname = clean_param($paramvalue, PARAM_ALPHANUMEXT);
+            $missingparameters = str_replace(strtolower($paramname), '', $missingparameters);
+            break;
+        case 'lastname':
+            $wfclname = clean_param($paramvalue, PARAM_ALPHANUMEXT);
+            $missingparameters = str_replace(strtolower($paramname), '', $missingparameters);
+            break;
+        case 'country':
+            $wfccountry = clean_param($paramvalue, PARAM_ALPHA);
+            $missingparameters = str_replace(strtolower($paramname), '', $missingparameters);
+            break;
+        case 'learningpath':
+            $wfclp = clean_param($paramvalue, PARAM_ALPHANUMEXT);
+            $missingparameters = str_replace(strtolower($paramname), '', $missingparameters);
+            break;
+    }
+}
+
+if (empty($wfcsolid) || empty($wfcpnum) || empty($wfcfname) || empty($wfclname)) {
+    print_error('missingparam', 'auth_kronosportal', '', trim($missingparameters, ','));
+}
 
 $continueurl = new moodle_url("{$CFG->httpswwwroot}/index.php");
 $continuestringurl = $continueurl->out();
 $PAGE->set_url($continueurl);
 $context = context_system::instance();
 $PAGE->set_context($context);
-
-
 
 // Check if the auth plug-in is enabled.
 $authsequence = get_enabled_auth_plugins(true);
@@ -98,6 +131,7 @@ if (empty($muser)) {
     kronosportal_sync_user_profile_to_portal_profile($muser, $newusr);
     unset($muser->password);
 } else {
+    unset($muser->email, $muser->learningpath);
     // Load the user profile data.
     profile_load_data($muser);
     // Update the Moodle user object properties with new WFC data.

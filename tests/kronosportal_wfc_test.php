@@ -160,22 +160,6 @@ class auth_kronosportal_wfc_testcases extends advanced_testcase {
                         'country' => 'A',
                         'learningpath' => 'A')
                 ),
-                array(array(
-                        'solutionid' => 'A',
-                        'personnumber' => 'A',
-                        'firstname' => 'A',
-                        'lastname' => 'A',
-                        'country' => '',
-                        'learningpath' => 'A')
-                ),
-                array(array(
-                        'solutionid' => 'A',
-                        'personnumber' => 'A',
-                        'firstname' => 'A',
-                        'lastname' => 'A',
-                        'country' => 'A',
-                        'learningpath' => '')
-                ),
         );
     }
 
@@ -216,22 +200,6 @@ class auth_kronosportal_wfc_testcases extends advanced_testcase {
                         'firstname' => 'A',
                         'country' => 'A',
                         'learningpath' => 'A')
-                ),
-                array(array(
-                // Missing country.
-                        'solutionid' => 'A',
-                        'personnumber' => 'A',
-                        'firstname' => 'A',
-                        'lastname' => 'A',
-                        'learningpath' => 'A')
-                ),
-                array(array(
-                // Missing learningpath.
-                        'solutionid' => 'A',
-                        'personnumber' => 'A',
-                        'firstname' => 'A',
-                        'lastname' => 'A',
-                        'country' => 'A',)
                 ),
         );
     }

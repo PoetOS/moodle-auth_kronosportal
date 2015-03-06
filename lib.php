@@ -166,11 +166,13 @@ function kronosportal_is_user_userset_expired($auth, $id) {
     } else {
         $usersolutionid = $id;
     }
+
     // Search for a User Set that contains a matching Solutions ID with the user logging in.  Kronos User Set Soultion Ids are meant to be unique.
     $usersetcontextandname = $auth->userset_solutionid_exists($usersolutionid);
     if (empty($usersetcontextandname)) {
         return true;
     }
+
     // Check if the User Set expiry and extension date are less than the current date.
     return !$auth->user_set_has_valid_subscription($usersolutionid, $usersetcontextandname->id, $usersetcontextandname->name);
 }
@@ -221,10 +223,10 @@ function kronosportal_apply_kronos_business_rules($data) {
 
     // Set the username.
     $conditions = isset($data['solutionid']) && isset($data['personnumber'])
-        && isset($data['firstname']) && isset($data['lastname']) && isset($data['country']) && isset($data['learningpath']);
+        && isset($data['firstname']) && isset($data['lastname']);
 
     $nonemptyconditions = !empty($data['solutionid']) && !empty($data['personnumber'])
-        && !empty($data['firstname']) && !empty($data['lastname']) && !empty($data['country']) && !empty($data['learningpath']);
+        && !empty($data['firstname']) && !empty($data['lastname']);
 
     if ($conditions && $nonemptyconditions) {
         $newusr->username = 'wfc'.strtolower($data['solutionid'].$data['personnumber']);
@@ -233,10 +235,12 @@ function kronosportal_apply_kronos_business_rules($data) {
         $newusr->email = $newusr->username.'@wfc.kronos.com';
         $newusr->firstname = $data['firstname'];
         $newusr->lastname = $data['lastname'];
-        $newusr->country = $data['country'];
+        $newusr->country = isset($data['country']) ? $data['country'] : '';
         $newusr->lang = 'en';
-        $newusr->learningpath = ('-R' === substr($data['learningpath'], -2)) ? substr_replace($data['learningpath'], '', -2, 2) : $data['learningpath'];
-        $newusr->restricted = ('-R' === substr($data['learningpath'], -2)) ? '1' : '0';
+        if (isset($data['learningpath'])) {
+            $newusr->learningpath = ('-R' === substr($data['learningpath'], -2)) ? substr_replace($data['learningpath'], '', -2, 2) : $data['learningpath'];
+            $newusr->restricted = ('-R' === substr($data['learningpath'], -2)) ? '1' : '0';
+        }
         $newusr->personnumber = $data['personnumber'];
         $newusr->solutionid = $data['solutionid'];
     } else {

@@ -105,7 +105,7 @@ class auth_plugin_kronosportal extends auth_plugin_base {
             return 0;
         }
 
-        return clean_param(trim($usersolutionid), PARAM_ALPHANUM);
+        return clean_param(trim($usersolutionid), PARAM_ALPHANUMEXT);
     }
 
     /**
@@ -118,7 +118,7 @@ class auth_plugin_kronosportal extends auth_plugin_base {
     public function userset_solutionid_exists($usersolutionid) {
         global $DB;
 
-        $cleansolutionid = clean_param(trim($usersolutionid), PARAM_ALPHANUM);
+        $cleansolutionid = clean_param(trim($usersolutionid), PARAM_ALPHANUMEXT);
 
         $sql = "SELECT ctx.id, uset.name
                   FROM {local_elisprogram_uset} uset
@@ -161,7 +161,8 @@ class auth_plugin_kronosportal extends auth_plugin_base {
     public function user_set_has_valid_subscription($usersolutionid, $contextid, $usersetname = '') {
         global $DB;
 
-        $cleansolutionid = clean_param(trim($usersolutionid), PARAM_ALPHANUM);
+        $cleansolutionid = clean_param(trim($usersolutionid), PARAM_ALPHANUMEXT);
+        // UTC-1.
         $time = time();
 
         $sql = "SELECT fldint.id, fldint.data
