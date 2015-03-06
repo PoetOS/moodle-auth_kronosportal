@@ -151,6 +151,18 @@ class auth_kronosportal_testcase extends advanced_testcase {
 
         $this->assertEquals($result['status'], 'success');
         $this->assertEquals($result['userid'], $user->id);
+
+        // Test calling of web service with no country, city, language, learning path.
+        $result = $webservice->create_user("newusertest1", "Another", "Lastname", "testsolutionid", "Kronos#1pass",
+                "email2@test1.com");
+        $user = $DB->get_record('user', array('username' => 'newusertest1'));
+        // Retrieve custom user fields.
+        profile_load_data($user);
+        $this->assertEquals("newusertest1", $user->username);
+        $this->assertEquals("Another", $user->firstname);
+
+        $this->assertEquals($result['status'], 'success');
+        $this->assertEquals($result['userid'], $user->id);
     }
 
     /***
@@ -176,6 +188,39 @@ class auth_kronosportal_testcase extends advanced_testcase {
 
         $this->assertEquals($result['status'], 'success');
         $this->assertEquals($result['userid'], $user->id);
+
+        // Test optional fields city, country, lang, learning path are not updated.
+        $result = $webservice->update_user("newusertest", "Guy1", "Ord1", "extensionsolution", "Kronos#1pass1",
+                "email2@test1.com");
+        $user = $DB->get_record('user', array('username' => 'newusertest'));
+        // Retrieve custom user fields.
+        profile_load_data($user);
+        $this->assertEquals("success", $result['status']);
+        $this->assertEquals($user->id, $result['userid']);
+        $this->assertEquals("newusertest", $user->username);
+        $this->assertEquals("Guy1", $user->firstname);
+        $this->assertEquals("city1", $user->city);
+        $this->assertEquals("us", $user->country);
+        $this->assertEquals($CFG->lang, $user->lang);
+        $this->assertEquals("testlearningpath1", $user->profile_field_learningpath);
+        $this->assertEquals("extensionsolution", $user->profile_field_customerid);
+
+        // Test optional fields city, country are not updated and country, learning path are.
+        $result = $webservice->update_user("newusertest", "Guy1", "Ord1", "extensionsolution", "Kronos#1pass1",
+                "email2@test1.com", null, 'ca', null, 'path');
+
+        $user = $DB->get_record('user', array('username' => 'newusertest'));
+        // Retrieve custom user fields.
+        profile_load_data($user);
+        $this->assertEquals("success", $result['status']);
+        $this->assertEquals($user->id, $result['userid']);
+        $this->assertEquals("newusertest", $user->username);
+        $this->assertEquals("Guy1", $user->firstname);
+        $this->assertEquals("city1", $user->city);
+        $this->assertEquals("ca", $user->country);
+        $this->assertEquals($CFG->lang, $user->lang);
+        $this->assertEquals("path", $user->profile_field_learningpath);
+        $this->assertEquals("extensionsolution", $user->profile_field_customerid);
     }
 
     /**

@@ -125,10 +125,10 @@ class auth_kronosportal_external extends external_api {
             'solutionid' => new external_value(PARAM_TEXT, 'Solution ID/Customer ID'),
             'password' => new external_value(PARAM_TEXT, 'Password'),
             'email' => new external_value(PARAM_EMAIL, 'Email'),
-            'city' => new external_value(PARAM_TEXT, 'City'),
-            'country' => new external_value(PARAM_TEXT, 'Country'),
-            'language' => new external_value(PARAM_TEXT, 'Language'),
-            'learningpath' => new external_value(PARAM_TEXT, 'learningPath')
+            'city' => new external_value(PARAM_TEXT, 'City', VALUE_DEFAULT),
+            'country' => new external_value(PARAM_TEXT, 'Country', VALUE_DEFAULT),
+            'language' => new external_value(PARAM_TEXT, 'Language', VALUE_DEFAULT),
+            'learningpath' => new external_value(PARAM_TEXT, 'learningPath', VALUE_DEFAULT)
         ));
     }
 
@@ -140,8 +140,11 @@ class auth_kronosportal_external extends external_api {
      * @return array Return status and userid.
      */
     public static function create_user($username, $firstname, $lastname, $solutionid, $password,
-            $email, $city, $country, $language, $learningpath) {
-        global $DB;
+            $email, $city = '', $country = '', $language = '', $learningpath = null) {
+        global $DB, $CFG;
+        if ($language == '') {
+            $language = $CFG->lang;
+        }
         $usertoken = $DB->get_record('user', array('username' => $username));
         if (empty($usertoken)) {
             // Create user.
@@ -198,10 +201,10 @@ class auth_kronosportal_external extends external_api {
             'solutionid' => new external_value(PARAM_TEXT, 'Solution ID/Customer ID'),
             'password' => new external_value(PARAM_TEXT, 'Password'),
             'email' => new external_value(PARAM_EMAIL, 'Email'),
-            'city' => new external_value(PARAM_TEXT, 'City'),
-            'country' => new external_value(PARAM_TEXT, 'Country'),
-            'language' => new external_value(PARAM_TEXT, 'Language'),
-            'learningpath' => new external_value(PARAM_TEXT, 'learningPath')
+            'city' => new external_value(PARAM_TEXT, 'City', VALUE_DEFAULT),
+            'country' => new external_value(PARAM_TEXT, 'Country', VALUE_DEFAULT),
+            'language' => new external_value(PARAM_TEXT, 'Language', VALUE_DEFAULT),
+            'learningpath' => new external_value(PARAM_TEXT, 'learningPath', VALUE_DEFAULT)
         ));
     }
 
@@ -213,8 +216,11 @@ class auth_kronosportal_external extends external_api {
      * @return array Array with status equal to success and userid of updated record.
      */
     public static function update_user($username, $firstname, $lastname, $solutionid, $password,
-            $email, $city, $country, $language, $learningpath) {
-        global $DB;
+            $email, $city = null, $country = null, $language = '', $learningpath = null) {
+        global $DB, $CFG;
+        if ($language == '') {
+            $language = $CFG->lang;
+        }
         $usertoken = $DB->get_record('user', array('username' => $username), '*');
         if (empty($usertoken)) {
             throw new invalid_parameter_exception(get_string('webserviceerrorinvaliduser', 'auth_kronosportal'));
@@ -227,12 +233,21 @@ class auth_kronosportal_external extends external_api {
                 "lastname" => $lastname,
                 "profile_field_".kronosportal_get_solutionfield() => $solutionid,
                 "password" => $password,
-                "email" => $email,
-                "city" => $city,
-                "country" => $country,
-                "lang" => $language,
-                "profile_field_learningpath" => $learningpath
+                "email" => $email
             );
+            // Optional fields.
+            if ($language !== null) {
+                $userdata["lang"] = $language;
+            }
+            if ($city !== null) {
+                $userdata["city"] = $city;
+            }
+            if ($country !== null) {
+                $userdata["country"] = $country;
+            }
+            if ($learningpath !== null) {
+                $userdata["profile_field_learningpath"] = $learningpath;
+            }
             $result = kronosportal_validate_user((object)$userdata);
             if ($result == 'success') {
                 $user = kronosportal_update_user($userdata);
