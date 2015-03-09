@@ -154,19 +154,10 @@ function kronosportal_validate_user($user, $create = false) {
  * Check if the userset that userid is part of is expired or not.
  *
  * @param object $auth Authentication plugin object.
- * @param int|string $id User id or Solution id as a string.
+ * @param string $usersolutionid Solution id as a string.
  * @return boolean Returns true on expired false on userset is not expired.
  */
-function kronosportal_is_user_userset_expired($auth, $id) {
-    if (is_numeric($id)) {
-        $usersolutionid = $auth->get_user_solution_id($id);
-        if (empty($usersolutionid)) {
-            return true;
-        }
-    } else {
-        $usersolutionid = $id;
-    }
-
+function kronosportal_is_user_userset_expired($auth, $usersolutionid) {
     // Search for a User Set that contains a matching Solutions ID with the user logging in.  Kronos User Set Soultion Ids are meant to be unique.
     $usersetcontextandname = $auth->userset_solutionid_exists($usersolutionid);
     if (empty($usersetcontextandname)) {
@@ -181,18 +172,10 @@ function kronosportal_is_user_userset_expired($auth, $id) {
  * Check if the userset is valid.
  *
  * @param object $auth Authentication plugin object.
- * @param int|string $id User id or Solution id as a string.
+ * @param string $usersolutionid Solution id as a string.
  * @return boolean Returns true on expired false on userset is not expired.
  */
-function kronosportal_is_user_userset_valid($auth, $id) {
-    if (is_numeric($id)) {
-        $usersolutionid = $auth->get_user_solution_id($id);
-        if (empty($usersolutionid)) {
-            return false;
-        }
-    } else {
-        $usersolutionid = $id;
-    }
+function kronosportal_is_user_userset_valid($auth, $usersolutionid) {
     // Search for a User Set that contains a matching Solutions ID with the user logging in.  Kronos User Set Soultion Ids are meant to be unique.
     $usersetcontextandname = $auth->userset_solutionid_exists($usersolutionid);
     if (empty($usersetcontextandname)) {

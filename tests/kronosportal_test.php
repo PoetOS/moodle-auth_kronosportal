@@ -302,8 +302,16 @@ class auth_kronosportal_testcase extends advanced_testcase {
         $auth = get_auth_plugin('kronosportal');
         $result = $auth->userset_solutionid_exists('testsolutionid');
         $this->assertEquals("testuserset", $result->name);
+        $result = kronosportal_is_user_userset_valid($auth, 'testsolutionid');
+        $this->assertTrue($result);
         $result = $auth->userset_solutionid_exists('testsolutionidaaa');
         $this->assertFalse($result);
+        $result = kronosportal_is_user_userset_valid($auth, 'testsolutionidaaa');
+        $this->assertFalse($result);
+        $result = kronosportal_is_user_userset_valid($auth, '00000006-solutionid');
+        $this->assertTrue($result);
+        $result = kronosportal_is_user_userset_valid($auth, '00000006');
+        $this->assertTrue($result);
     }
 
     /**
@@ -338,15 +346,18 @@ class auth_kronosportal_testcase extends advanced_testcase {
         $auth = get_auth_plugin('kronosportal');
 
         // Valid.
-        $this->assertFalse(kronosportal_is_user_userset_expired($auth, $this->users[0]->id));
+        $solutionid = $auth->get_user_solution_id($this->users[0]->id);
+        $this->assertFalse(kronosportal_is_user_userset_expired($auth, $solutionid));
         $this->assertFalse(kronosportal_is_user_userset_expired($auth, 'testsolutionid'));
 
         // Expired.
-        $this->assertTrue(kronosportal_is_user_userset_expired($auth, $this->users[1]->id));
+        $solutionid = $auth->get_user_solution_id($this->users[1]->id);
+        $this->assertTrue(kronosportal_is_user_userset_expired($auth, $solutionid));
         $this->assertTrue(kronosportal_is_user_userset_expired($auth, 'expiredsolution'));
 
         // Extension.
-        $this->assertFalse(kronosportal_is_user_userset_expired($auth, $this->users[2]->id));
+        $solutionid = $auth->get_user_solution_id($this->users[2]->id);
+        $this->assertFalse(kronosportal_is_user_userset_expired($auth, $solutionid));
         $this->assertFalse(kronosportal_is_user_userset_expired($auth, 'extensionsolution'));
     }
 
@@ -602,6 +613,34 @@ class auth_kronosportal_testcase extends advanced_testcase {
             'name' => 'solutionextension name',
             'display' => 'test userset description',
             'field_customerid' => 'extensionsolution',
+            'field_expiry' => time() - 3600,
+            'field_extension' => time() + 3600,
+            'parent' => $us->id
+        );
+
+        $usinvalid = new userset();
+        $usinvalid->set_from_data((object)$userset);
+        $usinvalid->save();
+
+        // Create solutionid with only numeric charcters.
+        $userset = array(
+            'name' => 'solutionextension name 00000006',
+            'display' => 'test userset description',
+            'field_customerid' => '00000006',
+            'field_expiry' => time() - 3600,
+            'field_extension' => time() + 3600,
+            'parent' => $us->id
+        );
+
+        $usinvalid = new userset();
+        $usinvalid->set_from_data((object)$userset);
+        $usinvalid->save();
+
+        // Create solutionid with alpha, numeric charcters.
+        $userset = array(
+            'name' => 'solutionextension name 00000006-solutionid',
+            'display' => 'test userset description',
+            'field_customerid' => '00000006-solutionid',
             'field_expiry' => time() - 3600,
             'field_extension' => time() + 3600,
             'parent' => $us->id
