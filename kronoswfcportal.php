@@ -131,13 +131,13 @@ if (empty($muser)) {
     kronosportal_sync_user_profile_to_portal_profile($muser, $newusr);
     unset($muser->password);
 } else {
-    unset($muser->email, $muser->learningpath);
     // Load the user profile data.
     profile_load_data($muser);
     // Update the Moodle user object properties with new WFC data.
     kronosportal_sync_standard_wfc_profile_fields($muser, (object) $newusr);
     // Update the custom profile fields of the Moodle object with the WFC.
-    kronosportal_sync_user_profile_to_portal_profile($muser, $newusr);
+    kronosportal_sync_user_profile_to_portal_profile($muser, $newusr, true);
+    unset($muser->email);
 }
 
 // Update the user record in Moodle.

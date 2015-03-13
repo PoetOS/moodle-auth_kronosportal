@@ -252,10 +252,19 @@ function kronosportal_sync_standard_wfc_profile_fields($muser, $data) {
  * @todo add PHPUnit test.
  * @param object $muserdata A Moodle user object.
  * @param array $wfcuserdata A WFC user array.
+ * @param boolean $update Set to true when updating record.
  * @return object A Moodle profile fields (property) and protarl profile values (value).
  */
-function kronosportal_sync_user_profile_to_portal_profile($muserdata, $wfcuserdata) {
+function kronosportal_sync_user_profile_to_portal_profile($muserdata, $wfcuserdata, $update = false) {
     $config = get_config('auth_kronosportal');
+
+    $updatefields = array();
+    foreach ((array)$config as $moodlefieldname => $value) {
+        if (false !== strpos($moodlefieldname, 'update_profile_field_')) {
+            $moodlefieldname = preg_replace('/update_profile_field_/', 'profile_field_', $moodlefieldname);
+            $updatefields[$moodlefieldname] = $value;
+        }
+    }
 
     foreach ((array)$config as $moodlefieldname => $wfcfieldname) {
         if (false !== strpos($moodlefieldname, 'profile_field_')) {
@@ -263,8 +272,11 @@ function kronosportal_sync_user_profile_to_portal_profile($muserdata, $wfcuserda
             if (!isset($muserdata->$moodlefieldname) || !isset($wfcuserdata[$lowercase])) {
                 continue;
             }
-
-            $muserdata->$moodlefieldname = clean_param($wfcuserdata[$lowercase], PARAM_ALPHANUMEXT);
+            if (!$update || $update && !empty($updatefields[$moodlefieldname])) {
+                $muserdata->$moodlefieldname = clean_param($wfcuserdata[$lowercase], PARAM_ALPHANUMEXT);
+            } else {
+                unset($muserdata->$moodlefieldname);
+            }
         }
     }
 

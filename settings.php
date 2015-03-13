@@ -113,12 +113,18 @@ $title = get_string('header_portal_map', $langfile);
 $desc = get_string('header_portal_map_desc', $langfile);
 $settings->add(new \admin_setting_heading('kronosportal_userset_map', $title, $desc));
 
-$title = get_string('header_portal_map', $langfile);
-$desc = get_string('header_portal_map_desc', $langfile);
-$settings->add(new \admin_setting_heading('kronosportal_userset_map', $title, $desc));
-
 foreach ($moodlecustomfields as $shortname => $name) {
     $setting = new \admin_setting_configtext('profile_field_'.$shortname, $name, '', '', PARAM_TEXT);
+    $setting->plugin = AUTH_KRONOSPORTAL_COMP_NAME;
+    $settings->add($setting);
+}
+
+$title = get_string('header_portal_update', $langfile);
+$desc = get_string('header_portal_update_desc', $langfile);
+$settings->add(new \admin_setting_heading('kronosportal_update_map', $title, $desc));
+
+foreach ($moodlecustomfields as $shortname => $name) {
+    $setting = new \admin_setting_configcheckbox('update_profile_field_'.$shortname, $name, '', '', PARAM_TEXT);
     $setting->plugin = AUTH_KRONOSPORTAL_COMP_NAME;
     $settings->add($setting);
 }
