@@ -80,6 +80,9 @@ class auth_kronosportal_external extends external_api {
                 }
             }
             if ($update) {
+                // As par KRONOSDEV-73, the client has requested to not have the city and country updated via the create_token web service.
+                $city = null;
+                $country = null;
                 $result = self::update_user($username, $firstname, $lastname, $solutionid, $password,
                         $email, $city, $country, $language, $learningpath);
             }
