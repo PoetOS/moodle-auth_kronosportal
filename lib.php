@@ -29,6 +29,9 @@ require_once($CFG->dirroot.'/user/lib.php');
 require_once($CFG->dirroot.'/user/profile/lib.php');
 require_once($CFG->dirroot.'/auth/kronosportal/auth.php');
 require_once($CFG->dirroot.'/local/elisprogram/enrol/userset/moodleprofile/lib.php');
+require_once(elispm::lib('data/userset.class.php'));
+require_once(elispm::lib('data/usermoodle.class.php'));
+require_once(elispm::file('enrol/userset/manual/lib.php'));
 
 /**
  * Create kronos user.

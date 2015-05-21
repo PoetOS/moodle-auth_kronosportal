@@ -120,7 +120,7 @@ class auth_plugin_kronosportal extends auth_plugin_base {
 
         $cleansolutionid = clean_param(trim($usersolutionid), PARAM_ALPHANUMEXT);
 
-        $sql = "SELECT ctx.id, uset.name
+        $sql = "SELECT ctx.id, uset.name, uset.id AS usersetid
                   FROM {local_elisprogram_uset} uset
                   JOIN {local_eliscore_field_clevels} fldctx on fldctx.fieldid = ?
                   JOIN {context} ctx ON ctx.instanceid = uset.id AND ctx.contextlevel = fldctx.contextlevel

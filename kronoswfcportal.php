@@ -39,6 +39,8 @@ $wfclname = '';
 $wfccountry = '';
 $wfclp = '';
 $missingparameters = 'solutionid,personnumber,firstname,lastname';
+$assigntolearningpath = false;
+$userset = null;
 
 // This block of code is needd to handle POST variables from WFC portal sites, that contain with different case characters as there is not standard.
 foreach ($_POST as $paramname => $paramvalue) {
@@ -97,7 +99,8 @@ if (is_null($authplugin)) {
 }
 
 // Check if the User's User Set exists.
-if (!$authplugin->userset_solutionid_exists($wfcsolid)) {
+$solutionuserset = $authplugin->userset_solutionid_exists($wfcsolid);
+if (!$solutionuserset) {
     notice(get_string('wfc_auth_solutionid_not_found', 'auth_kronosportal'), $continuestringurl);
 }
 
@@ -126,9 +129,71 @@ $muser = $DB->get_record('user', array('username' => $newusr['username']));
 
 // If the user does not exist, create the user account.  Sync the WFC portal fields with the Moodle custom fields.
 if (empty($muser)) {
+
+    // Check if the new user's learning path exists.  This check is only for new users.
+    if (isset($newusr['learningpath']) && !empty($newusr['learningpath'])) {
+        // Retrieve a User Set whose parent is equal to the solution id and whose display name is equal to Learning Path display name (Subset).
+        $userset = userset::find(array(
+                new field_filter('parent', $solutionuserset->usersetid),
+                new field_filter('displayname', $newusr['learningpath']))
+        );
+
+        // If a learning path is found.  Set flag to true.
+        if ($userset->valid()) {
+            $assigntolearningpath = true;
+        } else {
+            // Log event.
+            $message = "Unable to create user (username: {$newusr['username']}).";
+            $message .= "  Learning Path (display name: {$newusr['learningpath']}) does not exist as a subset of User Set {$solutionuserset->name}";
+            // Assign the user to the Learning Path.
+            $event = \auth_kronosportal\event\kronosportal_learningpath_not_exist::create(array(
+                'other' => array(
+                    'username' => $newusr['username'],
+                    'message' => $message,
+                    'wfc_learning_path' => $newusr['learningpath'],
+                    'solution_userset_name' => $solutionuserset->name
+                )
+            ));
+            $event->trigger();
+
+            // Print an error message and do not proceed to create the new account.
+            notice(get_string('wfc_auth_error_learning_path_not_exist', 'auth_kronosportal'), $continuestringurl);
+        }
+    }
+
     $muser = kronosportal_create_user((object)$newusr);
     // Update the Moodle object with new custom field values.
     kronosportal_sync_user_profile_to_portal_profile($muser, $newusr);
+
+    // Assign user to learning path.
+    if ($assigntolearningpath) {
+        // This should never be null as there is an earlier check for the same empty value.
+        $userset = ($userset->valid()) ? $userset->current() : null;
+
+        // Retrieve the ELIS user record.
+        $elisuser = usermoodle::find(array(
+                new field_filter('muserid', $muser->id),
+                new field_filter('idnumber', $muser->username))
+        );
+
+        $elisuser = ($elisuser->valid() && !is_null($userset)) ? $elisuser->current() : null;
+
+        if (!is_null($elisuser)) {
+            cluster_manual_assign_user($userset->id, $elisuser->cuserid);
+        } else {
+            $message = "Unable to find ELIS user linked to Moodle user.  Moodle username {$muser->username}";
+            $event = \auth_kronosportal\event\kronosportal_elisuser_not_created::create(array(
+                'other' => array(
+                    'username' => $muser->username,
+                    'message' => $message,
+                )
+            ));
+            $event->trigger();
+
+            notice(get_string('wfc_auth_error_could_not_find_elis_user', 'auth_kronosportal'), $continuestringurl);
+        }
+    }
+
     unset($muser->password);
 } else {
     // Load the user profile data.
