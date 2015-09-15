@@ -109,6 +109,7 @@ if (kronosportal_is_user_userset_expired($authplugin, $wfcsolid)) {
     notice(get_string('wfc_auth_solutionid_expired', 'auth_kronosportal'), $continuestringurl);
 }
 
+$email = '';
 $usr = new stdClass();
 $usr->solutionid = $wfcsolid;
 $usr->personnumber = $wfcpnum;
@@ -202,6 +203,9 @@ if (empty($muser)) {
     kronosportal_sync_standard_wfc_profile_fields($muser, (object) $newusr);
     // Update the custom profile fields of the Moodle object with the WFC.
     kronosportal_sync_user_profile_to_portal_profile($muser, $newusr, true);
+    // Temporarily copy the user's email address.
+    $email = $muser->email;
+    // Unset the email so that it doesn't get updated. As per Kronos' business rules for WFC portal.
     unset($muser->email);
 }
 
@@ -220,6 +224,10 @@ if (!empty($redirecturl)) {
     $url = "{$CFG->wwwroot}/index.php";
 }
 
+// If the email place holder is not empty then assign it to the email property of the user object.
+if (!empty($email)) {
+    $muser->email = $email
+}
 // Log in the user.
 complete_user_login($muser);
 // Sets the username cookie.
