@@ -226,7 +226,7 @@ if (!empty($redirecturl)) {
 
 // If the email place holder is not empty then assign it to the email property of the user object.
 if (!empty($email)) {
-    $muser->email = $email
+    $muser->email = $email;
 }
 // Log in the user.
 complete_user_login($muser);
