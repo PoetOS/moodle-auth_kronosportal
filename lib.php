@@ -99,9 +99,10 @@ function kronosportal_update_user($userdata) {
     if (isset($userdata->password) && !empty($userdata->password)) {
         $updatepassword = true;
     }
-    user_update_user($user, $updatepassword);
     // Assign custom fields.
     profile_save_data($userdata);
+    // Call to update user must be placed after profile_save_data to ensure custom profile fields are saved before trigger is made.
+    user_update_user($user, $updatepassword);
 
     // Retrieve custom user fields.
     $user = $DB->get_record('user', array('id' => $userid));
