@@ -25,6 +25,10 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * Test kronosportal auth plugin and web service
+ * @group auth_kronosportal
+ */
 class auth_kronosportal_wfc_testcases extends advanced_testcase {
     /**
      * Tests set up.

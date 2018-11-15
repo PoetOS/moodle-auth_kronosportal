@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="local/obf/db" VERSION="20131122" COMMENT="XMLDB file for auth_kronosportal"
+<XMLDB PATH="auth/kronosportal/db" VERSION="20131122" COMMENT="XMLDB file for auth_kronosportal"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
