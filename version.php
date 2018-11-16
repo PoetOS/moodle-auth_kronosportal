@@ -24,10 +24,11 @@
  */
 defined ( 'MOODLE_INTERNAL' ) || die ();
 
-$plugin->version   = 2015012802;
+$plugin->version   = 2018110100;
 $plugin->requires  = 2014050800;
 $plugin->component = 'auth_kronosportal';
-$plugin->maturity = MATURITY_STABLE;
+$plugin->release = '3.5.0 Beta';
+$plugin->maturity = MATURITY_BETA;
 $plugin->dependencies = array(
     'local_elisprogram' => 2014082506.1
 );
