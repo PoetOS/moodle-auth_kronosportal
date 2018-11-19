@@ -245,7 +245,7 @@ class auth_kronosportal_testcase extends advanced_testcase {
     /**
      * Test kronosportal_validate_user
      */
-/*    public function test_auth_kronosportal_validate_user() {
+    public function test_auth_kronosportal_validate_user() {
         global $CFG;
         profile_load_data($this->users[0]);
         profile_load_data($this->users[1]);
@@ -253,7 +253,7 @@ class auth_kronosportal_testcase extends advanced_testcase {
         $this->assertEquals("success", kronosportal_validate_user($this->users[0]));
         $this->assertEquals("expired", kronosportal_validate_user($this->users[1]));
         $this->assertEquals("success", kronosportal_validate_user($this->users[2]));
-    } */
+    }
 
     /**
      * Test use of token for login and logout by token.
