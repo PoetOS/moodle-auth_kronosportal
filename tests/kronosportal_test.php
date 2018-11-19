@@ -180,7 +180,7 @@ class auth_kronosportal_testcase extends advanced_testcase {
         $result = $webservice->create_user("newusertest", "Guy", "Ord", "testsolutionid", "Kronos#1pass",
                 "email2@test.com", "city", "CA", "en", "testlearningpath");
         $result = $webservice->update_user("newusertest", "Guy1", "Ord1", "extensionsolution", "Kronos#1pass1",
-                "email2@test1.com", "city1", "us", "en", "testlearningpath1");
+                "email2@test1.com", "city1", "US", "en", "testlearningpath1");
         $user = $DB->get_record('user', array('username' => 'newusertest'));
         // Retrieve custom user fields.
         profile_load_data($user);
@@ -204,14 +204,14 @@ class auth_kronosportal_testcase extends advanced_testcase {
         $this->assertEquals("newusertest", $user->username);
         $this->assertEquals("Guy1", $user->firstname);
         $this->assertEquals("city1", $user->city);
-        $this->assertEquals("us", $user->country);
+        $this->assertEquals("US", $user->country);
         $this->assertEquals($CFG->lang, $user->lang);
         $this->assertEquals("testlearningpath1", $user->profile_field_learningpath);
         $this->assertEquals("extensionsolution", $user->profile_field_customerid);
 
         // Test optional fields city, country are not updated and country, learning path are.
         $result = $webservice->update_user("newusertest", "Guy1", "Ord1", "extensionsolution", "Kronos#1pass1",
-                "email2@test1.com", null, 'ca', null, 'path');
+                "email2@test1.com", null, 'CA', null, 'path');
 
         $user = $DB->get_record('user', array('username' => 'newusertest'));
         // Retrieve custom user fields.
@@ -221,7 +221,7 @@ class auth_kronosportal_testcase extends advanced_testcase {
         $this->assertEquals("newusertest", $user->username);
         $this->assertEquals("Guy1", $user->firstname);
         $this->assertEquals("city1", $user->city);
-        $this->assertEquals("ca", $user->country);
+        $this->assertEquals("CA", $user->country);
         $this->assertEquals($CFG->lang, $user->lang);
         $this->assertEquals("path", $user->profile_field_learningpath);
         $this->assertEquals("extensionsolution", $user->profile_field_customerid);
