@@ -44,9 +44,8 @@ class auth_kronosportal_testcase extends advanced_testcase {
      * Test token is created successfully and inserted into database
      */
     public function test_auth_kronosportal_create_token() {
-        global $CFG, $DB;
+        global $DB;
 
-        $auth = get_auth_plugin('kronosportal');
         $webservice = new auth_kronosportal_external();
         $user = $this->getDataGenerator()->create_user();
         $result = $webservice->create_token($user->username);
@@ -65,7 +64,6 @@ class auth_kronosportal_testcase extends advanced_testcase {
      * Test is_configuration_valid.
      */
     public function test_auth_kronosportal_is_configuration_valid() {
-        global $CFG, $DB;
         $auth = get_auth_plugin('kronosportal');
         $this->assertTrue($auth->is_configuration_valid());
         set_config('expiry', '', 'auth_kronosportal');
@@ -77,9 +75,8 @@ class auth_kronosportal_testcase extends advanced_testcase {
      * Test creation of user and token.
      */
     public function test_auth_kronosportal_create_token_user() {
-        global $CFG, $DB;
+        global $DB;
 
-        $auth = get_auth_plugin('kronosportal');
         $webservice = new auth_kronosportal_external();
         $result = $webservice->create_token("newusertest", "Guy", "Ord", "testsolutionid", "Kronos#1pass",
                 "email2@test.com", "city", "CA", "en", "testlearningpath");
@@ -111,9 +108,6 @@ class auth_kronosportal_testcase extends advanced_testcase {
      * Test creation of user and token with invalid solution id.
      */
     public function test_auth_kronosportal_create_token_user_invalidsolution() {
-        global $CFG, $DB;
-
-        $auth = get_auth_plugin('kronosportal');
         $webservice = new auth_kronosportal_external();
         $message = 'Invalid parameter value detected (SolutionID/Userset does not exist.)';
         $this->expectException('invalid_parameter_exception');
@@ -126,8 +120,6 @@ class auth_kronosportal_testcase extends advanced_testcase {
      * Test creation of user and token with expired solution id.
      */
     public function test_auth_kronosportal_create_token_user_expiredsolution() {
-        global $CFG, $DB;
-        $auth = get_auth_plugin('kronosportal');
         $webservice = new auth_kronosportal_external();
         $message = 'Invalid parameter value detected (SolutionID/Userset is expired.)';
         $this->expectException('invalid_parameter_exception');
@@ -140,9 +132,8 @@ class auth_kronosportal_testcase extends advanced_testcase {
      * Test creation of user.
      */
     public function test_auth_kronosportal_create_user() {
-        global $CFG, $DB;
+        global $DB;
 
-        $auth = get_auth_plugin('kronosportal');
         $webservice = new auth_kronosportal_external();
         $result = $webservice->create_user("newusertest", "Guy", "Ord", "testsolutionid", "Kronos#1pass",
                 "email2@test.com", "city", "CA", "en", "testlearningpath");
@@ -175,7 +166,6 @@ class auth_kronosportal_testcase extends advanced_testcase {
     public function test_auth_kronosportal_update_user() {
         global $CFG, $DB;
 
-        $auth = get_auth_plugin('kronosportal');
         $webservice = new auth_kronosportal_external();
         $result = $webservice->create_user("newusertest", "Guy", "Ord", "testsolutionid", "Kronos#1pass",
                 "email2@test.com", "city", "CA", "en", "testlearningpath");
@@ -231,8 +221,6 @@ class auth_kronosportal_testcase extends advanced_testcase {
      * Test throwing of expection when user does not exist
      */
     public function test_auth_kronosportal_create_token_invaliduser() {
-        global $CFG;
-
         $webservice = new auth_kronosportal_external();
         $message = 'Invalid parameter value detected (The following fields are required to create an account:';
         $message .= ' username, firstname, lastname, customerid, password and email)';
@@ -246,20 +234,22 @@ class auth_kronosportal_testcase extends advanced_testcase {
      * Test kronosportal_validate_user
      */
     public function test_auth_kronosportal_validate_user() {
-        global $CFG;
         profile_load_data($this->users[0]);
         profile_load_data($this->users[1]);
         profile_load_data($this->users[2]);
-        $this->assertEquals("success", kronosportal_validate_user($this->users[0]));
-        $this->assertEquals("expired", kronosportal_validate_user($this->users[1]));
-        $this->assertEquals("success", kronosportal_validate_user($this->users[2]));
+        $return = kronosportal_validate_user($this->users[0]);
+        $this->assertEquals("success", $return);
+        $return = kronosportal_validate_user($this->users[1]);
+        $this->assertEquals("expired", $return);
+        $return = kronosportal_validate_user($this->users[2]);
+        $this->assertEquals("success", $return);
     }
 
     /**
      * Test use of token for login and logout by token.
      */
     public function test_auth_kronosportal_login_logout_by_token() {
-        global $user, $CFG, $DB;
+        global $user, $DB;
 
         $auth = get_auth_plugin('kronosportal');
 
@@ -306,7 +296,7 @@ class auth_kronosportal_testcase extends advanced_testcase {
      * Test use of token for login and logout by user.
      */
     public function test_auth_kronosportal_login_logout_by_username() {
-        global $user, $CFG, $DB;
+        global $user, $DB;
         $auth = get_auth_plugin('kronosportal');
         $webservice = new auth_kronosportal_external();
         $testuser = $this->users[0];
@@ -540,7 +530,7 @@ class auth_kronosportal_testcase extends advanced_testcase {
      * Tests set up.
      */
     public function setUp() {
-        global $DB, $CFG;
+        global $CFG;
         require_once($CFG->dirroot.'/auth/kronosportal/lib.php');
         require_once($CFG->dirroot.'/auth/kronosportal/auth.php');
         require_once($CFG->dirroot.'/auth/kronosportal/externallib.php');
