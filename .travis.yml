@@ -42,6 +42,7 @@ install:
 - moodle-plugin-ci add-plugin --branch MOODLE_31_STABLE PoetOS/moodle-local_elisprogram
 - moodle-plugin-ci add-plugin --branch MOODLE_35_STABLE PoetOS/moodle-local_eliscore
 - moodle-plugin-ci add-plugin --branch MOODLE_31_STABLE PoetOS/moodle-local_elisreports
+- moodle-plugin-ci add-plugin --branch MOODLE_31_STABLE PoetOS/moodle-block_elisadmin
 - moodle-plugin-ci install
 
 script:
