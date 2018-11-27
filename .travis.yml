@@ -40,6 +40,7 @@ before_install:
 
 install:
 - moodle-plugin-ci add-plugin --branch MOODLE_31_STABLE PoetOS/moodle-local_elisprogram
+- moodle-plugin-ci add-plugin --branch MOODLE_35_STABLE PoetOS/moodle-local_eliscore
 - moodle-plugin-ci install
 
 script:
