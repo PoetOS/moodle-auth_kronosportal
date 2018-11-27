@@ -28,6 +28,8 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * Class report_completion_events_testcase
  *
+ * @group auth_kronosportal
+ *
  * Class for tests related to completion report events.
  *
  * @package    report_completion
@@ -131,7 +133,6 @@ class auth_kronosportal_events_testcase extends advanced_testcase {
      * Helper function to test the specified event with the specified data.
      */
     private function event_with_data_test($eventpath, $data) {
-
         $event = $eventpath::create($data);
         $sink = $this->redirectEvents();
         $event->trigger();
