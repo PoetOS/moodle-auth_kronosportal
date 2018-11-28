@@ -54,7 +54,7 @@ class auth_kronosportal_testcase extends advanced_testcase {
         $token = $result['token'];
 
         $this->assertEquals(strlen($token), 32);
-        $tokenrecords = $DB->get_record('kronosportal_tokens', array('token' => $token));
+        $tokenrecords = $DB->get_record('auth_kronosportal_tokens', array('token' => $token));
         $this->assertEquals($tokenrecords->token, $token);
         $this->assertEquals($tokenrecords->userid, $user->id);
         $this->assertEquals($tokenrecords->sid, '');
@@ -91,7 +91,7 @@ class auth_kronosportal_testcase extends advanced_testcase {
         $token = $result['token'];
 
         $this->assertEquals(strlen($token), 32);
-        $tokenrecords = $DB->get_record('kronosportal_tokens', array('token' => $token));
+        $tokenrecords = $DB->get_record('auth_kronosportal_tokens', array('token' => $token));
         $this->assertEquals($tokenrecords->token, $token);
         $this->assertEquals($tokenrecords->userid, $user->id);
         $this->assertEquals($tokenrecords->sid, '');
@@ -274,14 +274,14 @@ class auth_kronosportal_testcase extends advanced_testcase {
             'timemodified' => time()
         ));
 
-        $tokenrecords = $DB->get_record('kronosportal_tokens', array('token' => $token));
+        $tokenrecords = $DB->get_record('auth_kronosportal_tokens', array('token' => $token));
         $tokenrecords->sid = $sessionid;
-        $DB->update_record('kronosportal_tokens', $tokenrecords);
+        $DB->update_record('auth_kronosportal_tokens', $tokenrecords);
         $result = $webservice->logout_by_token($token);
         $this->assertEquals($result['status'], 'success');
 
         // Test token was deleted.
-        $tokenrecords = $DB->get_record('kronosportal_tokens', array('token' => $token));
+        $tokenrecords = $DB->get_record('auth_kronosportal_tokens', array('token' => $token));
 
         $this->assertEquals($tokenrecords, false);
 
@@ -319,14 +319,14 @@ class auth_kronosportal_testcase extends advanced_testcase {
             'timemodified' => time()
         ));
 
-        $tokenrecords = $DB->get_record('kronosportal_tokens', array('token' => $token));
+        $tokenrecords = $DB->get_record('auth_kronosportal_tokens', array('token' => $token));
         $tokenrecords->sid = $sessionid;
-        $DB->update_record('kronosportal_tokens', $tokenrecords);
+        $DB->update_record('auth_kronosportal_tokens', $tokenrecords);
         $result = $webservice->logout_by_user($testuser->username);
         $this->assertEquals($result['status'], 'success');
 
         // Test token was deleted.
-        $tokenrecords = $DB->get_record('kronosportal_tokens', array('token' => $token));
+        $tokenrecords = $DB->get_record('auth_kronosportal_tokens', array('token' => $token));
 
         $this->assertEquals($tokenrecords, false);
 
@@ -458,7 +458,7 @@ class auth_kronosportal_testcase extends advanced_testcase {
         session_id($sessionid);
         auth_kronosportal_observer::user_loggedin(null);
 
-        $tokenrecord = $DB->get_record('kronosportal_tokens', array('token' => $token));
+        $tokenrecord = $DB->get_record('auth_kronosportal_tokens', array('token' => $token));
 
         $this->assertEquals($tokenrecord->sid, $sessionid);
         $this->assertEquals($tokenrecord->userid, $USER->id);

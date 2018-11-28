@@ -22,14 +22,23 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @copyright  (C) 2015 Remote Learner.net Inc http://www.remote-learner.net
  */
-defined ( 'MOODLE_INTERNAL' ) || die ();
 
-$plugin->version   = 2018110101;
-$plugin->requires  = 2014050800;
-$plugin->component = 'auth_kronosportal';
-$plugin->release = '3.5.0 Beta';
-$plugin->maturity = MATURITY_BETA;
-$plugin->dependencies = array(
-    'local_elisprogram' => 2014082506.1
-);
-$plugin->cron      = 3600;
+defined('MOODLE_INTERNAL') || die();
+
+function xmldb_auth_kronosportal_upgrade($oldversion=0) {
+    global $DB;
+
+    $dbman = $DB->get_manager();
+
+    if ($oldversion < 2018110101) {
+        // Rename the tables using proper Moodle convention.
+        $table = new xmldb_table('kronosportal_tokens');
+        if ($dbman->table_exists($table)) {
+            $dbman->rename_table($table, 'auth_kronosportal_tokens');
+        }
+
+        upgrade_plugin_savepoint(true, 2018110101, 'auth', 'kronosportal');
+    }
+
+    return true;
+}

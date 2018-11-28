@@ -35,11 +35,11 @@ class auth_kronosportal_observer {
         global $USER, $DB;
         $token = optional_param('token', '', PARAM_RAW);
         if (!empty($token)) {
-            $tokenrecords = $DB->get_record('kronosportal_tokens', array('token' => $token));
+            $tokenrecords = $DB->get_record('auth_kronosportal_tokens', array('token' => $token));
             if ($tokenrecords) {
                 $tokenrecords->sid = session_id();
                 $tokenrecords->userid = $USER->id;
-                $DB->update_record('kronosportal_tokens', $tokenrecords);
+                $DB->update_record('auth_kronosportal_tokens', $tokenrecords);
             }
         }
     }

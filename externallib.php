@@ -93,7 +93,7 @@ class auth_kronosportal_external extends external_api {
         $record->userid = $usertoken->id;
         $record->token = $token;
         $record->timecreated = time();
-        $DB->insert_record('kronosportal_tokens', $record);
+        $DB->insert_record('auth_kronosportal_tokens', $record);
 
         return array(
             'status' => 'success',
@@ -301,7 +301,7 @@ class auth_kronosportal_external extends external_api {
         global $DB;
         // Delete session records assoicated with token.
         try {
-            $tokenrecord = $DB->get_record('kronosportal_tokens', array('token' => $token), '*', MUST_EXIST);
+            $tokenrecord = $DB->get_record('auth_kronosportal_tokens', array('token' => $token), '*', MUST_EXIST);
             $userid = $tokenrecord->userid;
         } catch (dml_missing_record_exception $ignored) {
             // Token was already destroyed.
@@ -311,16 +311,16 @@ class auth_kronosportal_external extends external_api {
         if ($alltokens) {
             // Delete all session records assoicated with user.
             try {
-                $tokenrecords = $DB->get_records('kronosportal_tokens', array('userid' => $tokenrecord->userid));
+                $tokenrecords = $DB->get_records('auth_kronosportal_tokens', array('userid' => $tokenrecord->userid));
                 foreach ($tokenrecords as $token) {
                     self::logout_session($token->sid, $userid);
                 }
-                $DB->delete_records('kronosportal_tokens', array("userid" => $user->id));
+                $DB->delete_records('auth_kronosportal_tokens', array("userid" => $user->id));
             } catch (dml_missing_record_exception $ignored ) {
                 throw new invalid_parameter_exception(get_string('webserviceerrortokennotfound', 'auth_kronosportal'));
             }
         } else {
-            $DB->delete_records('kronosportal_tokens', array("token" => $token));
+            $DB->delete_records('auth_kronosportal_tokens', array("token" => $token));
             if (!empty($tokenrecord->sid)) {
                 self::logout_session($tokenrecord->sid, $userid);
             }
@@ -375,14 +375,14 @@ class auth_kronosportal_external extends external_api {
 
         // Delete all session records assoicated with user.
         if (!empty($user->id)) {
-            $tokenrecords = $DB->get_records('kronosportal_tokens', array('userid' => $user->id));
+            $tokenrecords = $DB->get_records('auth_kronosportal_tokens', array('userid' => $user->id));
             if (count($tokenrecords) === 0) {
                 throw new invalid_parameter_exception(get_string('webserviceerrortokennotfound', 'auth_kronosportal'));
             }
             foreach ($tokenrecords as $token) {
                 self::logout_session($token->sid, $token->userid);
             }
-            $DB->delete_records('kronosportal_tokens', array("userid" => $user->id));
+            $DB->delete_records('auth_kronosportal_tokens', array("userid" => $user->id));
         }
 
         return array('status' => 'success');

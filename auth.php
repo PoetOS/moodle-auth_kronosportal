@@ -384,7 +384,7 @@ class auth_plugin_kronosportal extends auth_plugin_base {
         if (!empty($token)) {
             $frm = new stdClass();
             try {
-                $tokens = $DB->get_record('kronosportal_tokens', array('token' => $token), '*', MUST_EXIST);
+                $tokens = $DB->get_record('auth_kronosportal_tokens', array('token' => $token), '*', MUST_EXIST);
             } catch (dml_missing_record_exception $e) {
                 // Token not found.
                 $this->handleerror($errorurl, 'tokennotfound');
@@ -449,7 +449,7 @@ class auth_plugin_kronosportal extends auth_plugin_base {
      */
     public function prelogout_hook() {
         global $DB;
-        $DB->delete_records('kronosportal_tokens', array('sid' => session_id()));
+        $DB->delete_records('auth_kronosportal_tokens', array('sid' => session_id()));
     }
 
     /**
@@ -461,7 +461,7 @@ class auth_plugin_kronosportal extends auth_plugin_base {
         global $DB;
         // Expire tokens after 24 hours.
         $expiry = time() - 24 * 3600;
-        $DB->delete_records_select('kronosportal_tokens', ' timecreated < ? ', array($expiry));
+        $DB->delete_records_select('auth_kronosportal_tokens', ' timecreated < ? ', array($expiry));
     }
 
 }
