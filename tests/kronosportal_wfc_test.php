@@ -34,7 +34,7 @@ class auth_kronosportal_wfc_testcases extends advanced_testcase {
      * Tests set up.
      */
     public function setUp() {
-        global $DB, $CFG;
+        global $CFG;
         require_once($CFG->dirroot.'/auth/kronosportal/lib.php');
         $this->resetAfterTest();
     }

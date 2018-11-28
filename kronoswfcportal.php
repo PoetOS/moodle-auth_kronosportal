@@ -23,13 +23,11 @@
  * @copyright  (C) 2015 Remote Learner.net Inc http://www.remote-learner.net
  */
 
-defined('MOODLE_INTERNAL') || die();
-
 if (!isset($_SERVER['HTTPS']) || 'off' == $_SERVER['HTTPS']) {
     die('A connection using SSL is required.');
 }
 
-require('../../config.php');
+require_once('../../config.php');
 require_once('lib.php');
 
 global $DB, $PAGE;
