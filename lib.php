@@ -23,6 +23,8 @@
  * @copyright  (C) 2015 Remote Learner.net Inc http://www.remote-learner.net
  */
 
+defined('MOODLE_INTERNAL') || die();
+
 define('AUTH_KRONOSPORTAL_COMP_NAME', 'auth_kronosportal');
 
 require_once($CFG->dirroot.'/user/lib.php');
@@ -75,7 +77,7 @@ function kronosportal_create_user($userdata) {
  * @return object User object.
  */
 function kronosportal_update_user($userdata) {
-    global $DB, $CFG;
+    global $DB;
     if (is_array($userdata)) {
         $userdata = (object)$userdata;
     }
@@ -162,7 +164,8 @@ function kronosportal_validate_user($user, $create = false) {
  * @return boolean Returns true on expired false on userset is not expired.
  */
 function kronosportal_is_user_userset_expired($auth, $usersolutionid) {
-    // Search for a User Set that contains a matching Solutions ID with the user logging in.  Kronos User Set Soultion Ids are meant to be unique.
+    // Search for a User Set that contains a matching Solutions ID with the user logging in.
+    // Kronos User Set Soultion Ids are meant to be unique.
     $usersetcontextandname = $auth->userset_solutionid_exists($usersolutionid);
     if (empty($usersetcontextandname)) {
         return true;
@@ -180,7 +183,8 @@ function kronosportal_is_user_userset_expired($auth, $usersolutionid) {
  * @return boolean Returns true on expired false on userset is not expired.
  */
 function kronosportal_is_user_userset_valid($auth, $usersolutionid) {
-    // Search for a User Set that contains a matching Solutions ID with the user logging in.  Kronos User Set Soultion Ids are meant to be unique.
+    // Search for a User Set that contains a matching Solutions ID with the user logging in.
+    // Kronos User Set Soultion Ids are meant to be unique.
     $usersetcontextandname = $auth->userset_solutionid_exists($usersolutionid);
     if (empty($usersetcontextandname)) {
         return false;
@@ -225,7 +229,8 @@ function kronosportal_apply_kronos_business_rules($data) {
         $newusr->country = isset($data['country']) ? $data['country'] : '';
         $newusr->lang = 'en';
         if (isset($data['learningpath'])) {
-            $newusr->learningpath = ('-R' === substr($data['learningpath'], -2)) ? substr_replace($data['learningpath'], '', -2, 2) : $data['learningpath'];
+            $newusr->learningpath = ('-R' === substr($data['learningpath'], -2)) ? substr_replace(
+                $data['learningpath'], '', -2, 2) : $data['learningpath'];
             $newusr->restricted = ('-R' === substr($data['learningpath'], -2)) ? '1' : '0';
         }
         $newusr->personnumber = $data['personnumber'];

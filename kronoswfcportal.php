@@ -23,6 +23,8 @@
  * @copyright  (C) 2015 Remote Learner.net Inc http://www.remote-learner.net
  */
 
+defined('MOODLE_INTERNAL') || die();
+
 if (!isset($_SERVER['HTTPS']) || 'off' == $_SERVER['HTTPS']) {
     die('A connection using SSL is required.');
 }
@@ -42,7 +44,8 @@ $missingparameters = 'solutionid,personnumber,firstname,lastname';
 $assigntolearningpath = false;
 $userset = null;
 
-// This block of code is needd to handle POST variables from WFC portal sites, that contain with different case characters as there is not standard.
+// This block of code is needd to handle POST variables from WFC portal sites, that contain with different case characters
+// as there is not standard.
 foreach ($_POST as $paramname => $paramvalue) {
     switch (strtolower($paramname)) {
         case 'solutionid':
@@ -133,7 +136,8 @@ if (empty($muser)) {
 
     // Check if the new user's learning path exists.  This check is only for new users.
     if (isset($newusr['learningpath']) && !empty($newusr['learningpath'])) {
-        // Retrieve a User Set whose parent is equal to the solution id and whose display name is equal to Learning Path display name (Subset).
+        // Retrieve a User Set whose parent is equal to the solution id and whose display name is equal to Learning Path display
+        // name (Subset).
         $userset = userset::find(array(
                 new field_filter('parent', $solutionuserset->usersetid),
                 new field_filter('displayname', $newusr['learningpath']))
@@ -145,7 +149,8 @@ if (empty($muser)) {
         } else {
             // Log event.
             $message = "Unable to create user (username: {$newusr['username']}).";
-            $message .= "  Learning Path (display name: {$newusr['learningpath']}) does not exist as a subset of User Set {$solutionuserset->name}";
+            $message .= "  Learning Path (display name: {$newusr['learningpath']}) does not exist as a subset of " .
+                "User Set {$solutionuserset->name}";
             // Assign the user to the Learning Path.
             $event = \auth_kronosportal\event\kronosportal_learningpath_not_exist::create(array(
                 'other' => array(

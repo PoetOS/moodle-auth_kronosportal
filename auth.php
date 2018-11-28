@@ -47,7 +47,8 @@ class auth_plugin_kronosportal extends auth_plugin_base {
     public function is_configuration_valid() {
         $valid = false;
         foreach ($this->config as $configname => $value) {
-            if ('expiry' == $configname || 'extension' == $configname || 'solutionid' == $configname || 'user_field_solutionid' == $configname) {
+            if ('expiry' == $configname || 'extension' == $configname || 'solutionid' == $configname ||
+                'user_field_solutionid' == $configname) {
                 if (empty($value)) {
                     $valid = false;
                     break;
@@ -73,7 +74,8 @@ class auth_plugin_kronosportal extends auth_plugin_base {
             return false;
         }
 
-        $exists = $DB->record_exists('user_info_data', array('userid' => $userid, 'fieldid' => $this->config->user_field_solutionid), 'id,data');
+        $exists = $DB->record_exists('user_info_data', array('userid' => $userid,
+            'fieldid' => $this->config->user_field_solutionid), 'id,data');
 
         if (empty($exists)) {
             $event = \auth_kronosportal\event\kronosportal_user_profile_solutionid_not_found::create(array(
@@ -99,7 +101,8 @@ class auth_plugin_kronosportal extends auth_plugin_base {
     public function get_user_solution_id($userid) {
         global $DB;
 
-        $usersolutionid = $DB->get_field('user_info_data', 'data', array('userid' => $userid, 'fieldid' => $this->config->user_field_solutionid));
+        $usersolutionid = $DB->get_field('user_info_data', 'data', array('userid' => $userid,
+            'fieldid' => $this->config->user_field_solutionid));
 
         if (empty($usersolutionid)) {
             return 0;
@@ -128,11 +131,12 @@ class auth_plugin_kronosportal extends auth_plugin_base {
                  WHERE uset.depth = 2
                        AND fldchar.data = ?";
 
-        $usersetcontextandname = $DB->get_record_sql($sql, array($this->config->solutionid, $this->config->solutionid, $cleansolutionid));
+        $usersetcontextandname = $DB->get_record_sql($sql, array($this->config->solutionid, $this->config->solutionid,
+            $cleansolutionid));
 
         if (empty($usersetcontextandname)) {
-            $message = "Login attempt by {$this->username}.  Unable to find User Set with mathcing SolutionID (User Set Solution ID fieldid: {$this->config->solutionid}.".
-                " User SolutionID: {$cleansolutionid})";
+            $message = "Login attempt by {$this->username}.  Unable to find User Set with mathcing SolutionID " .
+                "(User Set Solution ID fieldid: {$this->config->solutionid}. User SolutionID: {$cleansolutionid})";
             $event = \auth_kronosportal\event\kronosportal_userset_not_found::create(array(
                 'other' => array(
                     'username' => $this->username,
@@ -149,7 +153,8 @@ class auth_plugin_kronosportal extends auth_plugin_base {
     }
 
     /**
-     * This function checks if the User Set  has expired, by checking if the current time is greater than either the expiry or extension date.
+     * This function checks if the User Set  has expired, by checking if the current time is greater than either the expiry or
+     * extension date.
      * Note: The user's time zone cannot because at this stage of the login process, the user's session has not been created yet.
      * As a result the system time is being used.
      * @todo write phpunit tests at some point in the future.
@@ -175,8 +180,9 @@ class auth_plugin_kronosportal extends auth_plugin_base {
 
         // Check if any of the fields exist.
         if (empty($records)) {
-            $message = "Login attempt by {$this->username}. Unable to find User Set Expiry or Extended fields (Context Instance ID: {$contextid}, ".
-                "Expiry date fieldid: {$this->config->expiry}, Extension date fieldid: {$this->config->extension}, User SolutionID: {$cleansolutionid})";
+            $message = "Login attempt by {$this->username}. Unable to find User Set Expiry or Extended fields " .
+                "(Context Instance ID: {$contextid}, Expiry date fieldid: {$this->config->expiry}, Extension date fieldid: " .
+                "{$this->config->extension}, User SolutionID: {$cleansolutionid})";
             $event = \auth_kronosportal\event\kronosportal_userset_expiry_not_found::create(array(
                 'other' => array(
                     'username' => $this->username,
@@ -190,7 +196,8 @@ class auth_plugin_kronosportal extends auth_plugin_base {
             return false;
         }
 
-        // Check that the current time is greater than the expiry and/or the extension timestamps.  Using server time because the user global has not yet been initialzied.
+        // Check that the current time is greater than the expiry and/or the extension timestamps.
+        // Using server time because the user global has not yet been initialzied.
         $subscriptionsvalid = false;
         foreach ($records as $record) {
             if ($record->data > $time) {
@@ -228,7 +235,7 @@ class auth_plugin_kronosportal extends auth_plugin_base {
      * @return bool Authentication success or failure.
      */
     public function user_login($username, $password) {
-        global $CFG, $DB, $USER, $SESSION;
+        global $CFG, $DB, $SESSION;
         // Check if the plug-in is configured correctly.
         if (!$this->is_configuration_valid()) {
             $event = \auth_kronosportal\event\kronosportal_invalid_configuration::create(array());

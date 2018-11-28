@@ -112,7 +112,7 @@ class auth_kronosportal_testcase extends advanced_testcase {
         $message = 'Invalid parameter value detected (SolutionID/Userset does not exist.)';
         $this->expectException('invalid_parameter_exception');
         $this->expectExceptionMessage($message);
-        $result = $webservice->create_token("newusertest", "Guy", "Ord", "invalidsolutionid", "Kronos#1pass",
+        $webservice->create_token("newusertest", "Guy", "Ord", "invalidsolutionid", "Kronos#1pass",
                 "email2@test.com", "city", "CA", "en", "testlearningpath");
     }
 
@@ -124,7 +124,7 @@ class auth_kronosportal_testcase extends advanced_testcase {
         $message = 'Invalid parameter value detected (SolutionID/Userset is expired.)';
         $this->expectException('invalid_parameter_exception');
         $this->expectExceptionMessage($message);
-        $result = $webservice->create_token("newusertest", "Guy", "Ord", "expiredsolution", "Kronos#1pass",
+        $webservice->create_token("newusertest", "Guy", "Ord", "expiredsolution", "Kronos#1pass",
                 "email2@test.com", "city", "CA", "en", "testlearningpath");
     }
 
@@ -226,7 +226,7 @@ class auth_kronosportal_testcase extends advanced_testcase {
         $message .= ' username, firstname, lastname, customerid, password and email)';
         $this->expectException('invalid_parameter_exception');
         $this->expectExceptionMessage($message);
-        $result = $webservice->create_token('doesnotexists');
+        $webservice->create_token('doesnotexists');
     }
 
 

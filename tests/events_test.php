@@ -95,7 +95,7 @@ class auth_kronosportal_events_testcase extends advanced_testcase {
         $datefieldid2 = 86;
         $message = "Login attempt by {$user->username}in context (Context Instance ID: {$context->id}.";
         $data = ['other' => ['username' => $user->username, 'message' => $message, 'context_id' => $context->id,
-            'user_set_expriy_date_field_id' => $datefieldid1, 'user_set_extension_date_field_id' => $datefieldid2,]];
+            'user_set_expriy_date_field_id' => $datefieldid1, 'user_set_extension_date_field_id' => $datefieldid2, ]];
         $this->event_with_data_test('\auth_kronosportal\event\kronosportal_userset_expiry_not_found', $data);
     }
 

@@ -23,6 +23,8 @@
  * @copyright  (C) 2015 Remote Learner.net Inc http://www.remote-learner.net
  */
 
+defined('MOODLE_INTERNAL') || die();
+
 require_once($CFG->libdir."/externallib.php");
 require_once($CFG->dirroot."/auth/kronosportal/lib.php");
 
@@ -64,7 +66,7 @@ class auth_kronosportal_external extends external_api {
         global $DB;
         $usertoken = $DB->get_record('user', array('username' => $username));
         if (empty($usertoken)) {
-            $result = self::create_user($username, $firstname, $lastname, $solutionid,
+            self::create_user($username, $firstname, $lastname, $solutionid,
                     $password, $email, $city, $country, $language, $learningpath);
             $usertoken = $DB->get_record('user', array('username' => $username));
             if (empty($usertoken)) {
@@ -80,11 +82,12 @@ class auth_kronosportal_external extends external_api {
                 }
             }
             if ($update) {
-                // As par KRONOSDEV-73, the client has requested to not have the city and country updated via the create_token web service.
+                // As par KRONOSDEV-73, the client has requested to not have the city and country updated via the create_token
+                // web service.
                 $city = null;
                 $country = null;
-                $result = self::update_user($username, $firstname, $lastname, $solutionid, $password,
-                        $email, $city, $country, $language, $learningpath);
+                self::update_user($username, $firstname, $lastname, $solutionid, $password,
+                    $email, $city, $country, $language, $learningpath);
             }
         }
 
@@ -315,7 +318,7 @@ class auth_kronosportal_external extends external_api {
                 foreach ($tokenrecords as $token) {
                     self::logout_session($token->sid, $userid);
                 }
-                $DB->delete_records('auth_kronosportal_tokens', array("userid" => $user->id));
+                $DB->delete_records('auth_kronosportal_tokens', array("userid" => $userid));
             } catch (dml_missing_record_exception $ignored ) {
                 throw new invalid_parameter_exception(get_string('webserviceerrortokennotfound', 'auth_kronosportal'));
             }
@@ -363,7 +366,7 @@ class auth_kronosportal_external extends external_api {
     public static function logout_by_user($username) {
         global $DB;
 
-        $params = self::validate_parameters(self::logout_by_user_parameters(), array(
+        self::validate_parameters(self::logout_by_user_parameters(), array(
             'username' => $username
         ));
 
